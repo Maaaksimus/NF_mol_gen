@@ -182,4 +182,3 @@ dependencies:
       - tornado==6.2
       - traitlets==5.9.0
       - wcwidth==0.2.13
-prefix: /home/p.zhilyaev/anaconda3/envs/my_env
