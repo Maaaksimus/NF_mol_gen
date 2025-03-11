@@ -226,8 +226,9 @@ class Zinc_Processor(object):
 
         self.adj_features = np.empty((len(all_adj_feature), len(all_adj_feature[0]), len(all_adj_feature[0][0]), len(all_adj_feature[0][0][0])))
         print('succesfully allocated')
-        for i in tqdm(range(len(all_adj_feature) // 10000 + 1)):
-            self.adj_features[i * 10000 : (i + 1) * 10000] = np.array(all_adj_feature[i * 10000 : (i + 1) * 10000])
+        slice_size = 1000
+        for i in tqdm(range(len(all_adj_feature) // slice_size + 1)):
+            self.adj_features[i * slice_size : (i + 1) * slice_size] = np.array(all_adj_feature[i * slice_size : (i + 1) * slice_size])
         
         print('out')
         # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
