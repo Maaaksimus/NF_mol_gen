@@ -178,7 +178,9 @@ class Zinc_Processor(object):
             add_Hs=False, kekulize=True, max_atoms=38, max_size=self.max_size)
         self.node_features, self.adj_features, self.mol_sizes, self.smiles = self._load_data(
             self.in_path)
+        print('try to save')
         self._save_data(self.out_path)
+        print('save config')
         self._save_config(self.out_path)
 
     def _load_data(self, path):
