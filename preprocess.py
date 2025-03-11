@@ -179,6 +179,7 @@ class Zinc_Processor(object):
         self.node_features, self.adj_features, self.mol_sizes, self.smiles = self._load_data(
             self.in_path)
         print('try to save')
+        print(self.out_path)
         self._save_data(self.out_path)
         print('save config')
         self._save_config(self.out_path)
@@ -215,7 +216,9 @@ class Zinc_Processor(object):
         return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
 
     def _save_data(self, path):
+        print('in')
         print('saving node/adj feature...')
+        print('where?')
         print('shape of node feature:', self.node_features.shape)
         print('shape of adj features:', self.adj_features.shape)
         print('shape of mol sizes:', self.mol_sizes.shape)
