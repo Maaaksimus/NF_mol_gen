@@ -213,7 +213,9 @@ class Zinc_Processor(object):
             fp.close()
         self.n_molecule = cnt
         print('total number of valid molecule in dataset: %d' % self.n_molecule)
-        return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
+        self.node_features, self.adj_features, self.mol_sizes, self.smiles = np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles
+        print('out')
+        # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
 
     def _save_data(self, path):
         print('in')
