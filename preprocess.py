@@ -226,7 +226,7 @@ class Zinc_Processor(object):
 
         if not os.path.exists(self.out_path):
             os.makedirs(self.out_path)
-
+        path = self.out_path
         np.save(os.path.join(path, 'node_features'), np.array(all_node_feature))
         np.save(os.path.join(path, 'adj_features'),
                 np.array(all_adj_feature).astype(np.uint8))  # save space
