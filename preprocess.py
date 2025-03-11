@@ -224,14 +224,10 @@ class Zinc_Processor(object):
         # print('all_mol_size deleted')
         # self.smiles = all_smiles
 
-        if not os.path.exists(self.out_path):
-            os.makedirs(self.out_path)
-        path = self.out_path
-        np.save(os.path.join(path, 'node_features'), np.array(all_node_feature))
-        np.save(os.path.join(path, 'adj_features'),
-                np.array(all_adj_feature).astype(np.uint8))  # save space
-        np.save(os.path.join(path, 'mol_sizes'), np.array(all_mol_size))  # save space
-        np.save(os.path.join(path, 'smiles'), all_smiles)
+        self.adj_features = np.empty((len(all_adj_feature), len(all_adj_feature[0]), len(all_adj_feature[0][0]), len(all_adj_feature[0][0][0])))
+        print('succesfully allocated')
+        for i in tqdm(range(len(all_adj_feature) // 10000 + 1)):
+            self.adj_features[i * 10000 : (i + 1) * 10000] = np.array(all_adj_feature[i * 10000 : (i + 1) * 10000])
         
         print('out')
         # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
