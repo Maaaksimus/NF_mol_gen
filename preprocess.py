@@ -213,7 +213,16 @@ class Zinc_Processor(object):
             fp.close()
         self.n_molecule = cnt
         print('total number of valid molecule in dataset: %d' % self.n_molecule)
-        self.node_features, self.adj_features, self.mol_sizes, self.smiles = np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles
+        self.node_features = np.array(all_node_feature)
+        del all_node_feature
+        print('all_node_feature deleted')
+        self.adj_features = np.array(all_adj_feature)
+        del all_adj_feature
+        print('all_adj_feature deleted')
+        self.mol_sizes = np.array(all_mol_size)
+        del all_mol_size
+        print('all_mol_size deleted')
+        # self.smiles = all_smiles
         print('out')
         # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
 
