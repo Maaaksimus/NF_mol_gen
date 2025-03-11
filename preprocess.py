@@ -213,16 +213,26 @@ class Zinc_Processor(object):
             fp.close()
         self.n_molecule = cnt
         print('total number of valid molecule in dataset: %d' % self.n_molecule)
-        self.node_features = np.array(all_node_feature)
-        del all_node_feature
-        print('all_node_feature deleted')
-        self.adj_features = np.array(all_adj_feature)
-        del all_adj_feature
-        print('all_adj_feature deleted')
-        self.mol_sizes = np.array(all_mol_size)
-        del all_mol_size
-        print('all_mol_size deleted')
+        # self.node_features = np.array(all_node_feature)
+        # del all_node_feature
+        # print('all_node_feature deleted')
+        # self.adj_features = np.array(all_adj_feature)
+        # del all_adj_feature
+        # print('all_adj_feature deleted')
+        # self.mol_sizes = np.array(all_mol_size)
+        # del all_mol_size
+        # print('all_mol_size deleted')
         # self.smiles = all_smiles
+
+        if not os.path.exists(self.out_path):
+            os.makedirs(self.out_path)
+
+        np.save(os.path.join(path, 'node_features'), np.array(all_node_feature))
+        np.save(os.path.join(path, 'adj_features'),
+                np.array(all_adj_feature).astype(np.uint8))  # save space
+        np.save(os.path.join(path, 'mol_sizes'), np.array(all_mol_size))  # save space
+        np.save(os.path.join(path, 'smiles'), all_smiles)
+        
         print('out')
         # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
 
