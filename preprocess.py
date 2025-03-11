@@ -224,19 +224,17 @@ class Zinc_Processor(object):
         # print('all_mol_size deleted')
         # self.smiles = all_smiles
 
-        self.adj_features = np.empty((len(all_adj_feature), len(all_adj_feature[0]), len(all_adj_feature[0][0]), len(all_adj_feature[0][0][0])), dtype=np.uint8)
-        print('succesfully allocated')
-        slice_size = 100
-        for i in tqdm(range(len(all_adj_feature) // slice_size + 1)):
-            self.adj_features[i * slice_size : (i + 1) * slice_size] = np.array(all_adj_feature[i * slice_size : (i + 1) * slice_size])
+        # self.adj_features = np.empty((len(all_adj_feature), len(all_adj_feature[0]), len(all_adj_feature[0][0]), len(all_adj_feature[0][0][0])), dtype=np.uint8)
+        # print('succesfully allocated')
+        # slice_size = 100
+        # for i in tqdm(range(len(all_adj_feature) // slice_size + 1)):
+        #     self.adj_features[i * slice_size : (i + 1) * slice_size] = np.array(all_adj_feature[i * slice_size : (i + 1) * slice_size])
         
-        print('out')
-        # return (np.array(all_node_feature), np.array(all_adj_feature), np.array(all_mol_size), all_smiles)
+        # print('out')
+        return (np.array(all_node_feature), np.array(all_adj_feature, dtype=np.uint8), np.array(all_mol_size), all_smiles)
 
     def _save_data(self, path):
-        print('in')
         print('saving node/adj feature...')
-        print('where?')
         print('shape of node feature:', self.node_features.shape)
         print('shape of adj features:', self.adj_features.shape)
         print('shape of mol sizes:', self.mol_sizes.shape)
