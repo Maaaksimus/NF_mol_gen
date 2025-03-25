@@ -2,6 +2,9 @@ import os
 import sys
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 
+import warnings
+warnings.filterwarnings("ignore")
+
 # for linux env.
 sys.path.insert(0,'..')
 import argparse
@@ -305,7 +308,7 @@ def optimize_mol(property_model:FlowProp, smiles, data_config, args, random=Fals
             continue
         sm_set.add(s)
         p = propf(m)
-        fp2 = AllChem.GetMorganFingerprint(m, 2)
+        fp2 = AllChem.GetMorganFingerprint(m, 2) # здесь возможно возникает то самое предупреждение с MorganFingerprint
         sim = DataStructs.TanimotoSimilarity(fp1, fp2)
         if sim >= 0:
             results[0].append((s, p, sim, smiles))
