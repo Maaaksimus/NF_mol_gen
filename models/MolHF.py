@@ -16,6 +16,7 @@ class MolHF(nn.Module):
         self.latent_node_length = self.max_size*self.node_dim
         self.latent_edge_length = self.max_size**2*self.bond_dim
 
+        # t * sqrt(exp^prior_ln_var) * E - матрица ковариации
         if args.learn_prior:
             self.prior_ln_var = nn.Parameter(torch.zeros(1))
         else:
@@ -188,6 +189,7 @@ class MolHF(nn.Module):
         else:
             z_adj = z[1]
         
+        # здесь prior_ln_var выступает в роли sigma = e^pr, prior_ln_var = 2 * pr
         ll_node = -1/2 * (math.log(2 * math.pi) +
                           self.prior_ln_var + torch.exp(-self.prior_ln_var) * (z_x**2))
         ll_node = ll_node.sum(-1)  # (B)
