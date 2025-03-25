@@ -93,6 +93,7 @@ def check_valency(mol):
         p = e.find('#')
         e_sub = e[p:]
         atomid_valence = list(map(int, re.findall(r'\d+', e_sub)))
+        
         return False, atomid_valence
 
 
