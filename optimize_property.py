@@ -35,6 +35,13 @@ from time import time, ctime
 import functools
 print = functools.partial(print, flush=True)
 
+from rdkit import rdBase
+blocker = rdBase.BlockLogs()
+
+# zinc250k
+num2atom = {0: 6, 1: 7, 2: 8, 3: 9, 4: 14, 5: 15, 6: 16}
+atom_valency = {6: 4, 7: 3, 8: 2, 9: 1, 14: 4, 15: 3, 16: 2}
+
 class FlowProp(nn.Module):
     def __init__(self, model:MolHF, hidden_size):
         super(FlowProp, self).__init__()
