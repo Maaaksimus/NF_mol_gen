@@ -346,6 +346,6 @@ if __name__ == '__main__':
     parser.add_argument('--out_path', type=str,
                         default='./data_preprocessed/zinc250k', help='out_path')
     args = parser.parse_args()
-    processor_dict = {'zinc250k': Zinc_Processor,'polymer': Polymer_Processor}
+    processor_dict = {'zinc250k': Zinc_Processor, 'zinc1500k': Zinc_Processor, 'polymer': Polymer_Processor}
 
     processor = processor_dict[args.dataset](args.in_path, args.out_path)

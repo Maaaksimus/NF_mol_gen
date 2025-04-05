@@ -9,6 +9,12 @@ import re
 import random
 import sys
 
+from rdkit import RDLogger
+
+# Отключение логирования RDKit
+logger = RDLogger.logger()
+logger.setLevel(RDLogger.CRITICAL)
+
 from preprocess import SmilesPreprocessor
 num2bond = {0: Chem.rdchem.BondType.SINGLE,
             1: Chem.rdchem.BondType.DOUBLE, 2: Chem.rdchem.BondType.TRIPLE}

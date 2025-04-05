@@ -2,6 +2,9 @@ import os
 import sys
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
 
+import warnings
+warnings.filterwarnings("ignore")
+
 # for linux env.
 sys.path.insert(0,'..')
 import argparse
@@ -36,8 +39,8 @@ from rdkit import rdBase
 blocker = rdBase.BlockLogs()
 
 # zinc250k
-num2atom = {0: 6, 1: 7, 2: 8, 3: 9, 4: 14, 5: 15, 6: 16}
-atom_valency = {6: 4, 7: 3, 8: 2, 9: 1, 14: 4, 15: 3, 16: 2}
+num2atom = {0: 6, 1: 7, 2: 8, 3: 9, 4: 15, 5: 16, 6: 17, 7: 35, 8: 53}
+atom_valency = {6: 4, 7: 3, 8: 2, 9: 1, 15: 3, 16: 2, 17: 1, 35: 1, 53: 1}
 
 class FlowProp(nn.Module):
     def __init__(self, model:MolHF, hidden_size):
@@ -312,7 +315,7 @@ def optimize_mol(property_model:FlowProp, smiles, data_config, args, random=Fals
             continue
         sm_set.add(s)
         p = propf(m)
-        fp2 = AllChem.GetMorganFingerprint(m, 2)
+        fp2 = AllChem.GetMorganFingerprint(m, 2) # здесь возможно возникает то самое предупреждение с MorganFingerprint
         sim = DataStructs.TanimotoSimilarity(fp1, fp2)
         if sim >= 0:
             results[0].append((s, p, sim, smiles))

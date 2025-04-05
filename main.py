@@ -16,6 +16,7 @@ from rdkit import Chem
 from torch.utils.data import DataLoader
 from dataloader import PretrainDataset
 import argparse
+import pandas as pd
 
 def arg_parse():
     parser = argparse.ArgumentParser(description='MolHF')
@@ -304,6 +305,9 @@ class Trainer:
         for idx, s in enumerate(valid_smiles):
             print('[{}] {}'.format(idx+1, s))
 
+        gen_mol_output = pd.Series(data=all_smiles, name='SMILES')
+        gen_mol_output.to_csv('MolHF gen.csv', sep=',', index=False)
+
         # The percentage of valid adjacent matrix among all the generated graphs
         Connectivity = 100*sum(connected_adjs)/num
 
@@ -422,10 +426,10 @@ if __name__ == '__main__':
     # print(list(dataset))
     train_loader = DataLoader(dataset, batch_size=args.batch_size,
                               collate_fn=PretrainDataset.collate_fn, shuffle=True, num_workers=args.num_workers, drop_last=True)
-    with open('train_loader.pickle', 'wb') as file:
-        # Сериализация и сохранение объекта в файл
-        print('try')
-        pickle.dump(train_loader, file)
+    # with open('train_loader.pickle', 'wb') as file:
+    #     # Сериализация и сохранение объекта в файл
+    #     print('try')
+    #     pickle.dump(train_loader, file)
 
     trainer = Trainer(train_loader, None, args)
     if args.init_checkpoint is not None:
@@ -453,7 +457,7 @@ if __name__ == '__main__':
         novel_ratio = []
         valid_5atom_ratio = []
         valid_39atom_ratio = []
-        for i in range(5):
+        for i in range(1):
             _, Validity, Validity_without_check, Uniqueness, Novelty, _, mol_atom_size = trainer.generate_molecule(
                 args.gen_num)
             valid_ratio.append(Validity)
