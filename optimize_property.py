@@ -266,12 +266,14 @@ def optimize_mol(property_model:FlowProp, smiles, data_config, args, random=Fals
             h = property_model.model.to_latent_format(mol_z)
             x_rev, adj_rev = property_model.reverse(h)
             reverse_smiles = adj_to_smiles(x_rev.cpu(), adj_rev.cpu(), num2atom, atom_valency)
+            print('one')
             print(smiles, reverse_smiles)
             z, _, _,  = property_model.model(atoms, bond)
             x_rev, adj_rev = property_model.model.reverse(z)
             reverse_smiles2 = adj_to_smiles(x_rev.cpu(), adj_rev.cpu(), num2atom, atom_valency)
             train_smiles2 = adj_to_smiles(atoms.cpu(), bond.cpu(), num2atom, atom_valency)
 
+            print('two')
             print(train_smiles2, reverse_smiles2)
             
     mol = Chem.MolFromSmiles(smiles)
@@ -509,7 +511,9 @@ def constrain_optimization_smiles(property_model, train_prop, data_config, args)
         col = 1
 
     print('Constrained optimization of {} score'.format(args.property_name))
+    print('tp: ', train_prop)
     train_prop_sorted = sorted(train_prop, key=lambda tup: tup[col]) #, reverse=True)  # qed, plogp, smile
+    print('tps: ', train_prop_sorted)
     result_list = [[],[],[],[]]
     nfail = [0, 0, 0, 0]
     for i, r in enumerate(train_prop_sorted):
@@ -520,10 +524,11 @@ def constrain_optimization_smiles(property_model, train_prop, data_config, args)
             print('Optimization {}/{}, time: {:.2f} seconds'.format(i, args.topk, time() - start_time))
         qed, plogp, smile = r
         results, ori = optimize_mol(property_model, smile,  data_config, args, random=False)
+        print('res: ', results)
         for t in range(len(results)):
             if len(results[t]) > 0:
                 smile2, property2, sim, _ = results[t][0]
-                plogp_delta = property2 - plogp
+                plogp_delta = property2 - qed
                 if plogp_delta >= 0:
                     result_list[t].append((smile2, property2, sim, smile, qed, plogp, plogp_delta))
                 else:

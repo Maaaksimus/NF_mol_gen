@@ -426,10 +426,6 @@ if __name__ == '__main__':
     # print(list(dataset))
     train_loader = DataLoader(dataset, batch_size=args.batch_size,
                               collate_fn=PretrainDataset.collate_fn, shuffle=True, num_workers=args.num_workers, drop_last=True)
-    # with open('train_loader.pickle', 'wb') as file:
-    #     # Сериализация и сохранение объекта в файл
-    #     print('try')
-    #     pickle.dump(train_loader, file)
 
     trainer = Trainer(train_loader, None, args)
     if args.init_checkpoint is not None:
