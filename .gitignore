@@ -20,6 +20,10 @@ docking/ligand
 data/
 fpscores.pkl.gz
 
+# Test MLP
+my_scripts/cifar-10-batches-py
+my_scripts/cifar-10-python.tar.gz
+
 # Pictures
 *.png
 
