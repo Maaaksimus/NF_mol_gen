@@ -10,6 +10,19 @@ __pycache__/
 # C extensions
 *.so
 
+# DS scores
+docking/gen_DS
+docking/zinc_DS
+docking/docking.pdbqt
+docking/ligand
+
+# SA scores
+data/
+fpscores.pkl.gz
+
+# Pictures
+*.png
+
 # Distribution / packaging
 .Python
 build/
