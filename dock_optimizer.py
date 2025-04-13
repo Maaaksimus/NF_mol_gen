@@ -28,12 +28,12 @@ parser = argparse.ArgumentParser()
 
 #общие параметры
 parser.dataset = 'zinc250k' 
-parser.device = 'cuda' 
+parser.device = 'cpu' 
 parser.seed = 42
 parser.save = True
 parser.model = 'MolHF'
 parser.order = 'bfs'
-parser.property_name = 'qed'
+parser.net_type = 'mlp_only'
 
 parser.init_checkpoint = './save_pretrain/zinc250k_model/checkpoint.pth'
 parser.model_dir = './save_optimization'
@@ -73,7 +73,7 @@ parser.opt_lr = 0.8
 parser.topscore = False
 parser.consopt = True
 parser.ratio = 0.5
-parser.max_epochs = 100
+parser.max_epochs = 3
 
 
 class PropNet(nn.Module):
@@ -141,7 +141,7 @@ def train_model(opt_model, optimizer, train_loader, metrics, tr, epoch, coder_ra
     total_true_y = []
     for i, batch in tqdm(enumerate(train_loader), total=train_iter_per_epoch):
 
-        if i > 10:
+        if i == 2:
             break
 
         x = batch['node'].to(parser.device)   # (bs,9,5)
@@ -197,6 +197,10 @@ def validate_model(model, valid_loader, metrics, col, tr, epoch):
     total_true_y = []
     with torch.no_grad():
         for i, batch in enumerate(valid_loader):
+
+            if i == 2:
+                break
+
             x = batch['node'].to(args.device)   # (bs,9,5)
             adj = batch['adj'].to(args.device)   # (bs,4,9, 9)
             true_y = batch['property'][:, col].unsqueeze(1).float().to(args.device)
@@ -243,7 +247,7 @@ def fit_model(model, train_loader, val_loader, args, property_model_path, coder_
         cur_metrics = validate_model(model, valid_loader, metrics, 0, tr, epoch)
         if best_metrics < cur_metrics:
             best_metrics = cur_metrics
-            print("Epoch {}, saving {} regression model to: {}".format(epoch+1, args.property_name, property_model_path))
+            print("Epoch {}, saving {} regression model to: {}".format(epoch+1, args.net_type, property_model_path))
             torch.save(model.state_dict(), property_model_path)
         
     tr.print_summary()
@@ -302,7 +306,7 @@ if args.property_model_path is None:
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size,collate_fn=PretrainDataset.collate_fn, num_workers=args.num_workers, drop_last=True)
     valid_loader = DataLoader(valid_dataset, batch_size=args.batch_size,collate_fn=PretrainDataset.collate_fn, num_workers=args.num_workers, drop_last=True)
 
-    property_model_path = os.path.join(args.model_dir, '{}_{}_{}_{}.pth'.format(args.property_name, args.split, args.dataset, args.ratio))
+    property_model_path = os.path.join(args.model_dir, '{}_{}_{}_{}.pth'.format(args.net_type, args.split, args.dataset, args.ratio))
     
     gen_model = MolHF(data_config, args).to(args.device)
     op.initialize_from_checkpoint(gen_model, args)
