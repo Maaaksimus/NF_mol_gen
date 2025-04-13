@@ -242,9 +242,11 @@ def fit_model(model, train_loader, val_loader, args, property_model_path, coder_
     
     for epoch in range(args.max_epochs):
         print("In epoch {}, Time: {}".format(epoch + 1, ctime()))
-        op.generate_molecule(model, train_loader, args, epoch) # проверка текущего качества генерации с принтами валидности и т.д. 
+        # op.generate_molecule(model, train_loader, args, epoch) # проверка текущего качества генерации с принтами валидности и т.д. 
+        
         train_model(model, optimizer, train_loader, metrics, tr, epoch)
         cur_metrics = validate_model(model, valid_loader, metrics, 0, tr, epoch)
+        
         if best_metrics < cur_metrics:
             best_metrics = cur_metrics
             print("Epoch {}, saving {} regression model to: {}".format(epoch+1, args.net_type, property_model_path))
