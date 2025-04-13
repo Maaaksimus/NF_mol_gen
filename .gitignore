@@ -15,6 +15,7 @@ docking/gen_DS
 docking/zinc_DS
 docking/docking.pdbqt
 docking/ligand
+docking/
 
 # SA scores
 data/
