@@ -333,3 +333,5 @@ else:
     property_model.load_state_dict(torch.load(property_model_path, map_location=args.device))
 
     property_model.eval()
+
+    
