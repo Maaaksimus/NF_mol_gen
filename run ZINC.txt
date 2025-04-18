@@ -1,0 +1,20 @@
+========== Обучение ==========
+python main.py --dataset zinc250k --device cuda --deq_scale 0.6 --train --save --batch_size 256 --lr 1e-3 --squeeze_fold 2 --n_block 4 --a_num_flows 6 --num_layers 2 --hid_dim 256 --b_num_flows 3 --filter_size 256 --temperature 0.6 --learn_prior --inv_conv --inv_rotate --condition --gen_num 10000
+
+========== Загрузка обученной модели ==========
+NEW
+python main.py --dataset zinc250k --device cuda --deq_scale 0.6 --batch_size 256 --lr 1e-3 --squeeze_fold 2 --n_block 4 --a_num_flows 6 --num_layers 2 --hid_dim 256 --b_num_flows 3 --filter_size 256 --temperature 0.6 --learn_prior --inv_conv --inv_rotate --condition --init_checkpoint ./save_pretrain/zinc250k_model/checkpoint.pth --gen_num 100
+
+OLD
+python main.py --dataset zinc250k --device cuda --gen_num 100 --init_checkpoint ./save_pretrain/zinc250k_model/checkpoint.pth --learn_prior --inv_conv --inv_rotate --condition --num_workers 0
+
+OPTIMIZATION
+python optimize_property.py --dataset zinc250k --device cpu --deq_scale 0.6 --batch_size 256 --lr 1e-3 --squeeze_fold 2 --n_block 4 --a_num_flows 6 --num_layers 2 --hid_dim 256 --b_num_flows 3 --filter_size 256 --temperature 0.6 --learn_prior --inv_conv --inv_rotate --condition --init_checkpoint ./save_pretrain/zinc250k_model/checkpoint.pth --topk 30 --num_iter 10 --opt_lr 0.5 --consopt
+
+
+/trinity/home/p.zhilyaev/NFmol/NF_mol_gen
+/beegfs/home/p.zhilyaev/NFmol/NF_mol_gen
+/beegfs/home/p.zhilyaev/NFmol/NF_mol_gen/conda_env
+
+7666730
+7675423
