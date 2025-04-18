@@ -38,14 +38,14 @@ def dock_score(sml):
     box_center = [147, 154, -14]
     box_size = [20, 20, 20]
 
-    receptor = "/beegfs/home/p.zhilyaev/NFmol/NF_mol_gen/docking/receptor_chim.pdbqt"
-    vina_program = "/beegfs/home/p.zhilyaev/NFmol/NF_mol_gen/docking/qvina02"
+    receptor = "./docking/receptor_chim.pdbqt"
+    vina_program = "Q:\\Program Files (x86)\\The Scripps Research Institute\\Vina\\vina.exe"
 
-    docking_res = '/beegfs/home/p.zhilyaev/NFmol/NF_mol_gen/docking/'
-    ligand = os.path.join(docking_res, 'ligand.pdbqt')
+    docking_res = ''
+    ligand = os.path.join(docking_res, 'ligand')
     docking_file = os.path.join(docking_res, 'docking.pdbqt')
     
-    run_line = "/beegfs/home/p.zhilyaev/NFmol/obabel-3.1.1/bin/obabel -:{} --gen3D -h -opdbqt -O {} --partialcharge gasteiger".format(sml, ligand)
+    run_line = "obabel -:{} --gen3D -h -opdbqt -O {} --partialcharge gasteiger".format(sml, ligand)
     result = run(run_line.split(), capture_output=True, text=True, timeout=None, env=os.environ)
 
     try:
