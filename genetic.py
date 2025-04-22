@@ -5,7 +5,7 @@ from rdkit.Chem import AllChem, Descriptors
 from rdkit.DataStructs import FingerprintSimilarity, TanimotoSimilarity
 from rdkit.Chem import Crippen
 from deap import base, creator, tools, algorithms
-# from docking.docking_modif import dock_score
+from docking.docking_modif import dock_score
 from envs.sascorer import calculateScore
 
 rdLogger = RDLogger.logger()
@@ -14,8 +14,8 @@ rdLogger.setLevel(RDLogger.ERROR)
 
 N_BITS = 1024
 
-def dock_score(sml):
-    return random.randrange(-12,-3)
+# def dock_score(sml):
+#     return random.randrange(-12,-3)
 
 def tanimoto(smiles, target_fp):
     """Функция для расчета расстояния Танимото до целевой молекулы"""
@@ -31,13 +31,15 @@ target_mol = Chem.MolFromSmiles(target_smiles)
 target_fp = AllChem.GetMorganFingerprintAsBitVect(target_mol, 2, nBits=N_BITS)
 
 # Исходный набор молекул
-initial_smiles = [
-    "CCO", "CCN", "CC(=O)O", "C1CCCCC1", "c1ccccc1",
-    "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",  # Кофеин
-    "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",  # Ибупрофен
-    "C1=CC(=C(C=C1Cl)Cl)Cl",  # Трихлорбензол
-    "C1CC1", "C=C", "C#N"
-]
+known_mols = {
+    'Cc1ccc2c(c1)C(C(C)CNC(=O)O)CCC2C': (-8.2, 3.563399759919447, 0.7333333333333333),
+    'Cc1ccc2c(c1)C(C(C)COC(=O)O)CCC2C': (-7.9, 3.598782008440157, 0.7333333333333333),
+    'Cc1ccc2c(c1)C(C(C)NCC(=O)O)CCC2C': (-7.4, 3.5622920676117547, 0.7049180327868853),
+    'Cc1ccc2c(c1)C(C(C)CCC(=O)O)COC2C': (-7.8, 3.623824907848441, 0.7049180327868853),
+    'Cc1ccc2c(c1)C(C(C)OCC(=O)O)CCC2C': (-7.6, 3.6754124818129377, 0.7049180327868853)
+}
+
+initial_smiles = list(known_mols.keys())
 
 # Преобразуем SMILES в fingerprint
 def smiles_to_fp(smiles):
@@ -50,13 +52,19 @@ def smiles_to_fp(smiles):
 def evaluate(individual):
     """Оцениваем молекулу по трем критериям"""
     smiles = individual[0]
+
+    global known_mols
     
     # Расчет всех показателей
     try:
+        if smiles in known_mols.keys():
+            return known_mols[smiles]
         mol = Chem.MolFromSmiles(smiles)
         ds = dock_score(smiles)
         sa = calculateScore(mol)
         tn = tanimoto(smiles, target_fp)
+        print(smiles, ds, sa, tn)
+        known_mols[smiles] = (ds, sa, tn)
     except:
         ds = 0
         sa = 100
@@ -116,99 +124,99 @@ toolbox.register("evaluate", evaluate)
 #     return 'C'
 
 # Функция для мутации SMILES
-from rdkit import Chem
-from rdkit.Chem import rdchem
-import random
+# from rdkit import Chem
+# from rdkit.Chem import rdchem
+# import random
 
-def mutate_mol(mol: rdchem.Mol, 
-               mutation_types: list = ['atom', 'bond', 'fragment', 'scaffold'],
-               prob: float = 0.3) -> rdchem.Mol:
+# def mutate_mol(mol: rdchem.Mol, 
+#                mutation_types: list = ['atom', 'bond', 'fragment', 'scaffold'],
+#                prob: float = 0.3) -> rdchem.Mol:
 
-    if mol is None or not mol.GetNumAtoms():
-        return mol
+#     if mol is None or not mol.GetNumAtoms():
+#         return mol
     
-    print('in mutate')
+#     print('in mutate')
     
-    # Создаем редактируемую копию молекулы
-    rw_mol = Chem.RWMol(mol)
+#     # Создаем редактируемую копию молекулы
+#     rw_mol = Chem.RWMol(mol)
     
-    # Выбираем случайный тип мутации
-    mutation_type = random.choice(mutation_types) if random.random() < prob else None
+#     # Выбираем случайный тип мутации
+#     mutation_type = random.choice(mutation_types) if random.random() < prob else None
     
-    try:
-        if mutation_type == 'atom' and rw_mol.GetNumAtoms() > 1:
-            # Мутация атома (замена на другой подходящий атом)
-            atom_idx = random.randint(0, rw_mol.GetNumAtoms()-1)
-            atom = rw_mol.GetAtomWithIdx(atom_idx)
-            new_atomic_num = random.choice([6, 7, 8, 9, 15, 16, 17, 35])  # C,N,O,F,P,S,Cl,Br
-            atom.SetAtomicNum(new_atomic_num)
+#     try:
+#         if mutation_type == 'atom' and rw_mol.GetNumAtoms() > 1:
+#             # Мутация атома (замена на другой подходящий атом)
+#             atom_idx = random.randint(0, rw_mol.GetNumAtoms()-1)
+#             atom = rw_mol.GetAtomWithIdx(atom_idx)
+#             new_atomic_num = random.choice([6, 7, 8, 9, 15, 16, 17, 35])  # C,N,O,F,P,S,Cl,Br
+#             atom.SetAtomicNum(new_atomic_num)
             
-        elif mutation_type == 'bond' and rw_mol.GetNumBonds() > 0:
-            # Мутация связи (изменение порядка связи)
-            bond_idx = random.randint(0, rw_mol.GetNumBonds()-1)
-            bond = rw_mol.GetBondWithIdx(bond_idx)
-            new_bond_type = random.choice([
-                Chem.BondType.SINGLE, 
-                Chem.BondType.DOUBLE, 
-                Chem.BondType.TRIPLE
-            ])
-            bond.SetBondType(new_bond_type)
+#         elif mutation_type == 'bond' and rw_mol.GetNumBonds() > 0:
+#             # Мутация связи (изменение порядка связи)
+#             bond_idx = random.randint(0, rw_mol.GetNumBonds()-1)
+#             bond = rw_mol.GetBondWithIdx(bond_idx)
+#             new_bond_type = random.choice([
+#                 Chem.BondType.SINGLE, 
+#                 Chem.BondType.DOUBLE, 
+#                 Chem.BondType.TRIPLE
+#             ])
+#             bond.SetBondType(new_bond_type)
             
-        elif mutation_type == 'fragment':
-            # Мутация фрагмента (добавление/удаление функциональных групп)
-            fragments = [
-                'C', 'O', 'N', 'F', 'Cl', 'Br', 
-                'C=O', 'CO', 'CN', 'C#N', 'CCl', 'CBr'
-            ]
-            frag = random.choice(fragments)
-            frag_mol = Chem.MolFromSmiles(frag)
+#         elif mutation_type == 'fragment':
+#             # Мутация фрагмента (добавление/удаление функциональных групп)
+#             fragments = [
+#                 'C', 'O', 'N', 'F', 'Cl', 'Br', 
+#                 'C=O', 'CO', 'CN', 'C#N', 'CCl', 'CBr'
+#             ]
+#             frag = random.choice(fragments)
+#             frag_mol = Chem.MolFromSmiles(frag)
             
-            if frag_mol and rw_mol.GetNumAtoms() > 0:
-                # Добавляем фрагмент к случайному атому
-                atom_idx = random.randint(0, rw_mol.GetNumAtoms()-1)
-                rw_mol.InsertMol(frag_mol)
-                rw_mol.AddBond(
-                    atom_idx, 
-                    rw_mol.GetNumAtoms()-1, 
-                    random.choice([Chem.BondType.SINGLE, Chem.BondType.DOUBLE])
-                )
+#             if frag_mol and rw_mol.GetNumAtoms() > 0:
+#                 # Добавляем фрагмент к случайному атому
+#                 atom_idx = random.randint(0, rw_mol.GetNumAtoms()-1)
+#                 rw_mol.InsertMol(frag_mol)
+#                 rw_mol.AddBond(
+#                     atom_idx, 
+#                     rw_mol.GetNumAtoms()-1, 
+#                     random.choice([Chem.BondType.SINGLE, Chem.BondType.DOUBLE])
+#                 )
                 
-        elif mutation_type == 'scaffold' and rw_mol.GetNumAtoms() > 5:
-            # Мутация скаффолда (изменение углеродного скелета)
-            scaffold_ops = [
-                'ADD_RING', 'REMOVE_RING', 
-                'ADD_CHAIN', 'REMOVE_CHAIN'
-            ]
-            op = random.choice(scaffold_ops)
+#         elif mutation_type == 'scaffold' and rw_mol.GetNumAtoms() > 5:
+#             # Мутация скаффолда (изменение углеродного скелета)
+#             scaffold_ops = [
+#                 'ADD_RING', 'REMOVE_RING', 
+#                 'ADD_CHAIN', 'REMOVE_CHAIN'
+#             ]
+#             op = random.choice(scaffold_ops)
             
-            if op == 'ADD_RING':
-                # Добавляем 5- или 6-членное кольцо
-                size = random.choice([5, 6])
-                new_atoms = [rw_mol.AddAtom(Chem.Atom(6)) for _ in range(size)]
-                for i in range(size):
-                    rw_mol.AddBond(new_atoms[i], new_atoms[(i+1)%size], Chem.BondType.SINGLE)
+#             if op == 'ADD_RING':
+#                 # Добавляем 5- или 6-членное кольцо
+#                 size = random.choice([5, 6])
+#                 new_atoms = [rw_mol.AddAtom(Chem.Atom(6)) for _ in range(size)]
+#                 for i in range(size):
+#                     rw_mol.AddBond(new_atoms[i], new_atoms[(i+1)%size], Chem.BondType.SINGLE)
                     
-            elif op == 'REMOVE_RING':
-                # Удаляем случайное кольцо (если есть)
-                ri = mol.GetRingInfo()
-                if ri.NumRings() > 0:
-                    ring_atoms = list(ri.AtomRings()[random.randint(0, ri.NumRanges()-1)])
-                    for atom in sorted(ring_atoms, reverse=True):
-                        rw_mol.RemoveAtom(atom)
+#             elif op == 'REMOVE_RING':
+#                 # Удаляем случайное кольцо (если есть)
+#                 ri = mol.GetRingInfo()
+#                 if ri.NumRings() > 0:
+#                     ring_atoms = list(ri.AtomRings()[random.randint(0, ri.NumRanges()-1)])
+#                     for atom in sorted(ring_atoms, reverse=True):
+#                         rw_mol.RemoveAtom(atom)
                         
-        # Валидация и очистка структуры
-        new_mol = rw_mol.GetMol()
-        new_mol = Chem.SanitizeMol(new_mol, sanitizeOps=Chem.SanitizeFlags.SANITIZE_PROPERTIES)
+#         # Валидация и очистка структуры
+#         new_mol = rw_mol.GetMol()
+#         new_mol = Chem.SanitizeMol(new_mol, sanitizeOps=Chem.SanitizeFlags.SANITIZE_PROPERTIES)
         
-        # Если мутация привела к невалидной структуре, пробуем исправить
-        if isinstance(new_mol, Chem.rdmolops.SanitizeFlags):
-            print('YYYYYEEEE')
-            return mol  # Возвращаем исправленную исходную
+#         # Если мутация привела к невалидной структуре, пробуем исправить
+#         if isinstance(new_mol, Chem.rdmolops.SanitizeFlags):
+#             print('YYYYYEEEE')
+#             return mol  # Возвращаем исправленную исходную
         
-        return new_mol
+#         return new_mol
     
-    except:
-        return mol  # В случае ошибки возвращаем исправленную исходную
+#     except:
+#         return mol  # В случае ошибки возвращаем исправленную исходную
 
 # def correct_mol(mol: rdchem.Mol) -> rdchem.Mol:
     
@@ -246,25 +254,48 @@ def mutate_mol(mol: rdchem.Mol,
 #         new_mol = AllChem.MutateMol(mol)  # Простая мутация (может потребовать доработки)
 #     return Chem.MolToSmiles(new_mol)
 
+def mutate_smiles(smiles, num_mutations=1):
+    mol = Chem.MolFromSmiles(smiles)
+    if isinstance(mol, type(None)):
+        return target_smiles
+    new_smiles = None
+    for _ in range(num_mutations):
+        # Случайная мутация: удаление/добавление атома, изменение связей
+        new_mol = Chem.RWMol(mol)
+        atom_idx = np.random.randint(0, new_mol.GetNumAtoms())
+        new_mol.ReplaceAtom(atom_idx, Chem.Atom(int(np.random.choice([6, 7, 8]))))  # Меняем атом на C/N/O
+        try:
+            new_smiles = Chem.MolToSmiles(new_mol)
+            if Chem.MolFromSmiles(new_smiles) is None:
+                continue
+            mol = new_mol
+        except:
+            continue
+
+    if new_smiles is not None:
+        return new_smiles
+    
+    return smiles
+
 # Кастомная мутация для нашего случая
 def custom_mutate(individual):
     print('================')
     print(individual)
     mol = Chem.MolFromSmiles(individual[0])
-    new_mol = mutate_mol(mol)
-    print(type(new_mol), new_mol)
-    individual[0] = Chem.MolToSmiles(new_mol)
-    print('================')
+    # new_mol = mutate_mol(mol)
+    individual[0] = mutate_smiles(individual[0])
+    # print(type(new_mol), new_mol)
+    # individual[0] = Chem.MolToSmiles(new_mol)
     print(individual)
-    # individual[0] = mutate_smiles(individual[0])
+    print('================')
     return individual,
 
 toolbox.register("mutate", custom_mutate)
 
 # Кастомное скрещивание для SMILES
 def custom_crossover(ind1, ind2):
-    
-    print('in cross')
+
+    print('In corss')
 
     s1 = ind1[0]
     s2 = ind2[0]
@@ -283,8 +314,10 @@ def custom_crossover(ind1, ind2):
     # Проверяем валидность
     if Chem.MolFromSmiles(new_s1) is not None:
         ind1[0] = new_s1
+        print('Cross new: ', new_s1)
     if Chem.MolFromSmiles(new_s2) is not None:
         ind2[0] = new_s2
+        print('Cross new: ', new_s2)
     
     return ind1, ind2
 
@@ -303,7 +336,7 @@ def main():
     stats.register("max", np.max, axis=0)
     
     population, logbook = algorithms.eaSimple(
-        population, toolbox, cxpb=0.5, mutpb=0.2, ngen=20,
+        population, toolbox, cxpb=0.5, mutpb=0.2, ngen=100,
         stats=stats, halloffame=hof, verbose=True)
     
     return population, logbook, hof
