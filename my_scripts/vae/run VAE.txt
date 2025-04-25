@@ -1,0 +1,5 @@
+python scripts/train.py vae --d_dropout 0.2 --q_dropout 0 --device cuda:0 --seed 42 --train_load ../NF_mol_gen/my_scripts/moses_train.csv --val_load ../NF_mol_gen/my_scripts/moses_test.csv --model_save ../NF_mol_gen/my_scripts/vae --save_frequency 10 --log_file ../NF_mol_gen/my_scripts/vae/log.txt --config_save ../NF_mol_gen/my_scripts/vae/config.txt --vocab_save ../NF_mol_gen/my_scripts/vae/vocab.txt --kl_w_end 1
+
+===== Готовый для обучения конфиг VAE =====
+--q_cell gru --q_bidir --q_d_h 256 --q_n_layers 1 --q_dropout 0 --d_cell gru --d_n_layers 3 --d_dropout 0.2 --d_z 128 --d_d_h 512 --n_batch 128 --clip_grad 50 --kl_start 0 --kl_w_start 0 --kl_w_end 1 --lr_start 0.0003 # дальше пусть дефолтные стоят
+--device cuda:0 --seed 42 --train_load ../NF_mol_gen/my_scripts/moses_train.csv --val_load ../NF_mol_gen/my_scripts/moses_test.csv --model_save ../NF_mol_gen/my_scripts/vae/ --save_frequency 10 --log_file ../NF_mol_gen/my_scripts/vae/vae_train.log --config_save ../NF_mol_gen/my_scripts/vae/config.json --vocab_save ../NF_mol_gen/my_scripts/vae/vocab.json
